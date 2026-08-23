@@ -1,13 +1,13 @@
 # Python virtual environment
 backend/venv/
-backend/_pycache_/
+backend/__pycache__/
 backend/*.pyc
 
-# Local SQlite Database file
+# Local SQLite database files
 backend/instance/
 backend/*.db
 
-# Frontend dependencies
+# Frontend dependencies and build files
 frontend/node_modules/
 frontend/dist/
 
