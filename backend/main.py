@@ -39,7 +39,7 @@ def login():
     email = data.get("email", "").strip().lower()
     user = User.query.filter_by(email=email).first()
     if not user or not check_password_hash(user.password_hash, data.get("password", "")):
-        return jsonify({"message": "Invalid email or password"}), 401
+        return jsonify({"message": "email or password is Invalid"}), 401
     session["user_id"] = user.id
     return jsonify({"user": {"id": user.id, "email": user.email}})
 
@@ -75,7 +75,7 @@ def create_group():
     if not name:
         return jsonify({"message": "Group name is required"}), 400
     if Group.query.filter_by(user_id=user.id, name=name).first():
-        return jsonify({"message": "That group already exists"}), 409
+        return jsonify({"message": "Group already exists"}), 409
     group = Group(name=name, user_id=user.id)
     db.session.add(group)
     db.session.commit()
@@ -90,9 +90,9 @@ def group_detail(group_id):
 
     group = Group.query.filter_by(id=group_id, user_id=user.id).first()
     if not group:
-        return jsonify({"message": "Group not found"}), 404
+        return jsonify({"message": "Group is not found"}), 404
     if group.name in {"Home", "Friends", "Work"}:
-        return jsonify({"message": "Default groups cannot be changed"}), 403
+        return jsonify({"message": "Default groups cannot be altered"}), 403
 
     if request.method == "DELETE":
         Contact.query.filter_by(group_id=group.id, user_id=user.id).update(
@@ -106,7 +106,7 @@ def group_detail(group_id):
     if not name:
         return jsonify({"message": "Group name is required"}), 400
     if Group.query.filter(Group.user_id == user.id, Group.name == name, Group.id != group.id).first():
-        return jsonify({"message": "That group already exists"}), 409
+        return jsonify({"message": "Group already exists"}), 409
     group.name = name
     db.session.commit()
     return jsonify({"group": group.to_json()})

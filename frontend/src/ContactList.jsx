@@ -20,7 +20,7 @@ const ContactList = ({ contacts, onSelect, onEdit, onRefresh }) => {
     return (
       <div className="empty">
         <strong>No contacts here yet.</strong>
-        <span>Add someone or try another search.</span>
+        <span>Add Contact or try another search.</span>
       </div>
     );
   }

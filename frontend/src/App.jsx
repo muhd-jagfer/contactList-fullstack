@@ -35,7 +35,7 @@ function AuthScreen({ onAuthenticated }) {
           {registering ? "Create your account" : "Welcome back"}
         </h1>
 
-        <p className="muted">Keep the people who matter close.</p>
+        <p className="muted">Login or Register to continue.</p>
 
         <form onSubmit={submit} className="stack-form">
           <label>
@@ -74,8 +74,8 @@ function AuthScreen({ onAuthenticated }) {
           }}
         >
           {registering
-            ? "Already have an account? Log in"
-            : "Need an account? Register"}
+            ? "Already have an account? Log in to an existing account"
+            : "Need an account? Register new account"}
         </button>
       </section>
     </main>
@@ -178,7 +178,7 @@ function App() {
   };
 
   const deleteGroup = async (group) => {
-    if (!window.confirm(`Delete the ${group.name} group? Contacts will be unassigned.`)) return;
+    if (!window.confirm(`Delete the ${group.name} group?`)) return;
 
     try {
       await api(`/groups/${group.id}`, { method: "DELETE" });
