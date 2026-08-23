@@ -1,52 +1,83 @@
-import React from "react"
+import { api } from "./api";
 
-const ContactList = ({contacts, updateContact, updateCallback}) => {
-    const onDelete = async (id) => {
-        try {
-            const options = {
-                method : "DELETE"
-            }
-            const responce = await fetch(`http://127.0.0.1:5000/delete_contact/${id}`, options)
-            if (responce.status === 200) {
-                updateCallback()
-            } else {
-                console.error("failed To Delete")
+const ContactList = ({ contacts, onSelect, onEdit, onRefresh }) => {
+  const toggleFavorite = async (contact) => {
+    await api(`/contacts/${contact.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ isFavorite: !contact.isFavorite }),
+    });
+    onRefresh();
+  };
 
-            }
-        } catch (error) {
-            alert(error)
-        }
-    }
+  const remove = async (contact) => {
+    if (!window.confirm(`Delete ${contact.firstName}?`)) return;
 
-    return <div>
-        <h2>Contacts</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {contacts.map((contact) => (
-            <tr key={contact.id}>
-                <td>{contact.firstName}</td>
-                <td>{contact.lastName}</td>
-                <td>{contact.email}</td>
-                <td>{contact.phone}</td>
-                <td>
-                    <button onClick={() => updateContact(contact)}>Update</button>
-                    <button onClick={() => onDelete(contact.id)}>Delete</button>
-                </td>
-            </tr>
-            
-                ))}
-            </tbody>
-        </table>
+    await api(`/contacts/${contact.id}`, { method: "DELETE" });
+    onRefresh();
+  };
+
+  if (!contacts.length) {
+    return (
+      <div className="empty">
+        <strong>No contacts here yet.</strong>
+        <span>Add someone or try another search.</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="contact-list">
+      {contacts.map((contact) => (
+        <article
+          className="contact-row"
+          key={contact.id}
+          onClick={() => onSelect(contact)}
+        >
+          <div className="contact-name">
+            <strong>
+              {contact.firstName} {contact.lastName}
+            </strong>
+            <span>{contact.email || contact.phone || "No details added"}</span>
+          </div>
+
+          <span className="group-tag">
+            {contact.group?.name || "Unassigned"}
+          </span>
+
+          <button
+            className={`favorite ${contact.isFavorite ? "active" : ""}`}
+            onClick={(event) => {
+              event.stopPropagation();
+              toggleFavorite(contact);
+            }}
+            aria-label="Toggle favorite"
+          >
+            ★
+          </button>
+
+          <button
+            className="row-action"
+            onClick={(event) => {
+              event.stopPropagation();
+              onEdit(contact);
+            }}
+          >
+            Edit
+          </button>
+
+          <button
+            className="row-action danger"
+            onClick={(event) => {
+              event.stopPropagation();
+              remove(contact);
+            }}
+          >
+            Delete
+          </button>
+        </article>
+      ))}
     </div>
-}
+  );
+};
 
-export default ContactList
+export default ContactList;

@@ -1,80 +1,74 @@
 import { useState } from "react";
+import { api } from "./api";
 
-const ContactForm = ({ existingContact = {}, updateCallback}) => {
-    const [firstName, setFirstName] = useState(existingContact.firstName || "");
-    const [lastName, setLastName] = useState(existingContact.lastName || "");
-    const [email, setEmail] = useState(existingContact.email || "");
-    const [phone, setPhone] = useState(existingContact.phone || "")
+const ContactForm = ({ existingContact = {}, groups, onSaved }) => {
+  const [form, setForm] = useState({
+    firstName: existingContact.firstName || "",
+    lastName: existingContact.lastName || "",
+    email: existingContact.email || "",
+    phone: existingContact.phone || "",
+    groupId: existingContact.group?.id || "",
+    isFavorite: existingContact.isFavorite || false,
+  });
+  const [error, setError] = useState("");
+  const update = (event) => {
+    const { name, type, value, checked } = event.target;
+    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+  };
 
-    const updating = Object.entries(existingContact).length !== 0
+  const submit = async (event) => {
+    event.preventDefault();
 
-    const onSubmit = async (e) => {
-        e.preventDefault()
-
-        const data = {
-            firstName,
-            lastName,
-            email,
-            phone
-        }
-        const url = "http://127.0.0.1:5000/" + (updating ? `update_contact/${existingContact.id}` : "create_contact")
-        const options = {
-            method: updating ? "PATCH" : "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        }
-        const responce = await fetch(url, options)
-        if(responce.status !== 201 && responce.status !== 200){
-            const data = await responce.json()
-            alert(data.message)
-        } else {
-            updateCallback()
-        }
+    try {
+      await api(existingContact.id ? `/contacts/${existingContact.id}` : "/contacts", {
+        method: existingContact.id ? "PATCH" : "POST",
+        body: JSON.stringify({ ...form, groupId: form.groupId || null }),
+      });
+      onSaved();
+    } catch (requestError) {
+      setError(requestError.message);
     }
+  };
 
-    return(
-        <form onSubmit={onSubmit}>
-            <div>
-                <label htmlFor="firstName">First Name:</label>
-                <input
-                    type="text"
-                    id="firstName"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                />
-            </div>
-            <div>
-                <label htmlFor="lastName">Last Name:</label>
-                <input
-                    type="text"
-                    id="lastName"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                />
-            </div>
-            <div>
-                <label htmlFor="email">Email:</label>
-                <input
-                    type="text"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-            </div>
-            <div>
-                <label htmlFor="phone">Phone:</label>
-                <input
-                    type="text"
-                    id="phone"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                />
-            </div>
-            <button type="submit">{updating ? "Update" : "Create"}</button>
-        </form>
-    );
+  return (
+    <form onSubmit={submit} className="stack-form">
+      <label>
+        First name
+        <input name="firstName" value={form.firstName} onChange={update} required />
+      </label>
+      <label>
+        Last name
+        <input name="lastName" value={form.lastName} onChange={update} />
+      </label>
+      <label>
+        Email
+        <input name="email" type="email" value={form.email} onChange={update} />
+      </label>
+      <label>
+        Phone
+        <input name="phone" value={form.phone} onChange={update} />
+      </label>
+      <label>
+        Group
+        <select name="groupId" value={form.groupId} onChange={update}>
+          <option value="">No group</option>
+          {groups.map((group) => (
+            <option key={group.id} value={group.id}>
+              {group.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="check">
+        <input name="isFavorite" type="checkbox" checked={form.isFavorite} onChange={update} />
+        Favorite
+      </label>
+      {error && <p className="error">{error}</p>}
+      <button className="primary" type="submit">
+        {existingContact.id ? "Save changes" : "Create contact"}
+      </button>
+    </form>
+  );
 };
 
 export default ContactForm;
