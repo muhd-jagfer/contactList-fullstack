@@ -1,6 +1,5 @@
 # Contact Book
 
-#### Video Demo: <https://youtu.be/x1fqsxvzpX8?si=1-iKKPeNBuRoCWZF>
 
 #### Description:
 
