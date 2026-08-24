@@ -1,6 +1,6 @@
 # Contact Book
 
-#### Video Demo: <URL HERE>
+#### Video Demo: <https://youtu.be/x1fqsxvzpX8?si=1-iKKPeNBuRoCWZF>
 
 #### Description:
 
@@ -138,17 +138,6 @@ For custom groups, I decided that deleting a group should not delete the contact
 
 AI tools were used productively during development to help with coding, debugging, reviewing code, and improving code organization.
 
-## How to Run the Project
-
-### Backend Setup
-
-First, open a terminal and navigate to the backend directory:
-
-```bash
-cd backend
-pip install -r requirements.txt
-python main.py
-```
 ### Frontend
 
 The frontend uses:
